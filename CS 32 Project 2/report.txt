@@ -1,0 +1,103 @@
+Jake Herron
+UID: 005113997
+
+CS 32 Project 2 Report
+
+My doubly linked list starts with a dummy node that has contents that are irrelevant to us. We point our real head to the dummy node when we first construct our list. Then when we start inserting items into the list we have the next pointers point to the next item in the list and we have the previous pointers point to the previous items in the list. An empty Sequence will just consist of the dummy node with trivial contents with its next pointer pointing to itself and its previous pointer also pointing to itself. The list is circular as when we insert items, the ones at the end point to the head and we do not use null pointers. A typical Sequence would consist of objects that have their next pointers pointing to the next object in the sequence and the previous pointers pointing to the previous items in the sequence. The head pointer will point to the first item in the sequence and the last item in the sequence will circle around and point to the head. Inside each node, there is a next pointer, a previous pointer, and a data member that stores the contents.
+
+
+For the insert function, we check to make sure that pos is within the specified bounds. Then we allocate space for the insertion. We assign the desired value to the insertion. Then we make a pointer that we will use to loop through the list until we get the desired position. Once we get there we will reassign the pointers around this position so that the insertion and the items around it point correctly. Then we increment size by once and return the position it was inserted.
+
+For the next insert function, we make a pointer to loop through the list until we find the position where the value is less than the next item. Then we save this position and call the firist insert function to properly insert it and allocate the poitners. Then we return the position where it was inserted.
+
+For the erase function, first we check to make sure pos is within bounds. Then we make a pointer to loop through the list until we get to the position where we want to erase the item. Then we reposition the pointers around this position and we then delete the desired item.
+
+For the remove function, we initialize a counter for the amount of times we remove the item. Then we loop through the whole list and check if the item we are on is equal to the desired value. If it is, then we call the erase function to properly delete it then increment our counter. Once we are done, we return the counter.
+
+For the get function, we check our pos to make sure its in bounds. Then we loop through the list until we get to the desired position and then we store that data in the specified variable.
+
+For the set function, we check our pos to make sure its in bounds. Then we loop through the list until we get to the desired position and then we change that data to the value from the specified arguement.
+
+For the find function, we loop through the list and check if the item we are on is equal to our value. If it is then we will return its position, if not then we will keep going. If its not there then we just return -1.
+
+For the swap function, we create a temp size and temp Node to store the size and head of one of our sequences. Then we properly exchange these details and let the scope delete the temporary items.
+
+For the subsequence function, we store the first item of seq2 and we make a flag to specify if we have found a match. Then we loop through seq1 until we find an item that matches the first item of seq2. Then we loop through the rest of both sequences checking to make sure that the values match until we get to the end of seq2. If we get there and they all match then we return where they started matching. If they stop matching at some point, we will go through the loop again until we reach the end.
+
+For the interleave function, we first use the copy constructor to prevent problems from aliasing. Then we erase all the contents of our temp list. Then we loop through both sequences and insert each value into our temp list until we reach the end of one of our lists. Once we do, we check to see if there is still some of one of the lists left. If there is, then we put it at the end of our temp list. Then we reassing our temp list to the result and return result.
+
+Test cases:
+Sequence s; // test the constructor
+//    assert(s.empty() == true); // test empty
+//    assert(s.insert(0, 1) == 0); // test insert
+//    assert(s.insert(0, 0) == 0);
+//    assert(s.size() == 2); // test size
+//    ItemType x = 999;
+//    assert(s.get(0, x)  &&  x == 0); // test get
+//    assert(s.get(1, x)  &&  x == 1); 
+//    assert(s.insert(2) == 2); // test other insert function
+//    assert(s.get(2, x) && x == 2);
+//    assert(s.erase(1) == true); // test erase
+//    assert(s.get(1, x) && x == 2);
+//    assert(s.insert(1) == 1); 
+//    assert(s.insert(3) == 3);
+//    assert(s.insert(3) == 3);
+//    assert(s.remove(4) == 0); // test remove
+//    assert(s.remove(0) == 1);
+//    assert(s.remove(3) == 2);
+	assert(s.set(0, 1) == true); // test set function
+//    assert(s.get(0, x) && x == 1);
+//    assert(s.find(2) == 1); // test find
+
+    Sequence s1;
+    Sequence s2;
+    
+    s1.insert(0, 6);
+    s1.insert(0, 5);
+    s1.insert(0, 4);
+    s1.insert(0, 3);
+    s1.insert(0, 2);
+    s1.insert(0, 1);
+    s1.insert(0, 0);
+    s2.insert(0, 4);
+    s2.insert(0, 3);
+    s2.insert(0, 2);
+    assert(subsequence(s1, s2) == 2); // this will test the subsequence function
+
+    Sequence s1;
+    Sequence s2;
+    
+    s1.insert(0, 6);
+    s1.insert(0, 4);
+    s1.insert(0, 2);
+    s1.insert(0, 0);
+    s2.insert(0, 5);
+    s2.insert(0, 3);
+    s2.insert(0, 1);
+//    result.insert(0, 0);
+//    result.insert(0, 0);
+//    result.insert(0, 0);
+//    result.insert(0, 0);
+//    result.insert(0, 0);
+//    result.insert(0, 0);
+//    result.insert(0, 0);
+//    result.insert(0, 0);
+//    result.insert(0, 0);
+//    result.insert(0, 0);
+
+interleave(s1, s2, result) // this will test interleave and make sure that it still works if there are things in result when we start. It will output 0 through 6 in ascending order.
+
+Sequence a;
+a.insert(0);
+Sequence empty;
+//    a = empty;     
+//    assert(a.empty() == true); // test the assignment operator
+// this will also test the swap function because we use it in this assignment operator
+
+Sequence b;
+b.insert(24);
+c(b);
+ItemType x;
+assert(c.size() == 1);
+assert(get(0, x) && x == 24); // test the copy constructor
+

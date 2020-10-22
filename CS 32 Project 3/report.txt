@@ -1,0 +1,240 @@
+Jake Herron
+UID: 005113997
+
+CS 32 Project 3 Report
+
+Class Designs:
+For the Board class, I implemented two vectors to store the amount of beans in each hole and each pot. The indices matched the hole numbers with the pot being index 0 of the vector. For my sow function, I implemented a set of for loops to iterate through the holes and pots in the counter clockwise direction. This also kept track of which side and which hole the bean ended up in. For move to pot, I iterated through the holes on the correct side and added them to that sides pot. For beans in play, I iterated through the holes on one side and added them up to return the total. For total beans, I iterated through all of the holes including the pots and returned that total. For beans, I accessed the specified hole in the vector and returned the value stored there. I also implemented a copy constructor so I could copy a board which I would need later in player and game classes. 
+For the Player class, I made the subclasses human player, bad player, and smart player so they would inherit from the Player class. All of the players took in a string as a name and used the Player constructor to construct its own subclass. Human player was interactive and its choose move function first checked to make sure that the board passed to it still had beans left on both sides. Then it took input from the user and looped until the user gave it a valid integer hole number. Bad player was not interactive and its choose move function chose the hole with the lowest number that still had beans in it. It iterated through the holes until it found a hole with beans and chose that one. Smart player was not interactive and its choose move function used an implementation of the minimax algorithm to choose the best hole. I had to implement private member functions that would 1. check to see if a certain side has won yet 2. maximize the smart players score when choosing moves and 3. minimize the opponent players score when choosing moves. I will talk more about how it did this later in my description of this design.
+For the game class, I implemented a private board member, two pointer player members, and a member to store whose turn it was. For the constructor, I had to construct these elements in the initialization list. For the display function I went down line by line and looped through to make sure I displayed the right number of holes and totals. For the status function, I iterated through each side and summed up the beans in play. If either sum was equal to 0 that means that the game is over. Then I added the beans in play for each side to each side's pot and compared these two totals to determine who has won For the move function, I first checked if the game is already over when we start. Then I enter a while loop and access the player's choose move function to get a hole. Then I use sow function to make the move. I then check to see if I ended in my pot and if I did I change the flag so that I iterate through the while loop again to get another turn. I also check to see if my move resulted in a capture and if it did then I execute the capture. Finally, I switch whose turn it is. For the play function. I check to see if there are no beans in play for south because then the game is already over. Then I enter a while loop and display the board, call move, and check the game's status until the game is over. Once we have a winner, I output a winning message.
+
+Smart Player Choose Move Implementation:
+For this function, I first checked to make sure that the board that was passed to this function was valid and playable. Then started iterating through all of the possible moves which are the holes. I checked to make sure there were beans in the hole then I started making the move by making a copy of the board, calling the sow function with the hole number that we are iterating over, and checking for captures. Then called my maximize function with this copy of the board after the move was made. The goal of the maximize function is to maximize the score of the move that the computer player makes. The score in this case being the difference between the computer's pot total and the opponent's pot toal. In this maximize function, I passed an int that I will increment to track the depth of my move tree to keep within the time frames. In maximize, I check to see if the move has resulted in my side winning which will return a big score because this is the best outcome, then I checked to see if the move caused the other side to win which will return a low score because this is the worst possibel outcome. Then I checked to see if I have reached my depth max and if I have then I take the difference between the two pots and return this as the score of the move. If none of this happened then I iterate through all of the possible holes again and make a copy of the board, call the sow function, and check for captures. I choose between the current score and the score that comes from a call to minimize with the copy of the board and an increment to depth tracker. This minimize function acts to minimize the score of the opponents move which would result in a good outcome for our smart player. In minimize, I do the same things I do in maximize except I then choose the lower of the current score and a call the maximize with an incremented depth tracker. These calls keep going back and forth until I find a move that wins the game or I reach my depth maximum. These calls result in a recursive tree of all possible move and counter moves and their outcomes. I take these possible moves and compare them to find the one with the best score and then I return the hole number that corresponded with that hole.
+
+Pseudocode:
+
+BOARD CLASS
+
+Board constuctor
+Check if the values passed are valid
+	Assign member variables
+	Build each vector with the parameters passed
+If the values passed are not valid
+	Assign member variables and build vectors with specified exception values
+
+Board copy constructor
+Copy member variables
+Create blank vectors for each side
+Iterate through the number of holes
+	Assign the values from one vector to another on both sides
+
+Beans function
+Check to see if hole is valid
+If it is then go to the respective side
+	Access the vector value at that hole
+If hole is not valid return -1
+
+Beans in play function
+For each side
+Iterate through every hole
+	Add these values to a total and return that total
+
+Total beans function
+Iterate through all of the holes and pots on both sides
+	Add to over total and return that
+
+Sow function
+If the hole is not valid
+	return false
+If the hole we chose has no beans then return false
+For each side 
+Take the beans out of the specified hole and store them in a variable
+Iterate through the rest of the side you are on
+	Add a bean to each hole
+	Decrement your counter for each iteration
+Keep iterating the following until you don't have beans left
+	Put a bean in your pot and decrement counter
+	Iterate through the opponent's side
+		Add a bean to each hole
+		Decrement your counter each time
+	Iterate through your own side
+		add a bean to each hole
+		decrement your counter each time
+
+Move to pot function
+Check if hole is valid
+	if not return false
+Take the beans at a hole and add it to pot for each combination of pot owner and side
+
+Set beans function
+check if the hole is valid
+	if not return false
+check if beans is valid
+	if not return false
+Access the hole for the specified side and set the value to beans
+
+
+PLAYER CLASSES
+
+Human Player Choose Move function
+Check to make sure that passed in board is valid
+Keep iterating until you have a valid move
+	take in input
+	if the move is valid
+		change flag to get out of loop
+return move
+
+Bad Player Choose Move Function
+Check to make sure that the passed in board is valid
+Iterate through all possible holes
+	If there are beans in that hole
+		return that hole
+
+Smart Player hasThisSideWon function
+Check if one side has no beans in play
+	if false return false
+Add up beans in play and pot for both sides
+Compare the totals
+If passed in side's total is greater return true
+else return false
+
+Smart Player maximize function
+Check to see if your side won
+	if yes return big score
+check if other side won
+	if yes return small score
+check if we reached our max depth
+	if yes take difference between my pot and opponent pot and return that as score of move
+iterate through all possible move/holes
+	make the move and check for captures
+	take the larger between the current score and the score passed back by a call to minimize function with the new board
+
+Smart Player minimize function
+Check to see if your side won
+	if yes return big score
+check if other side won
+	if yes return small score
+check if we reached our max depth
+iterate through all possible moves/holes
+	make the move and check captures
+	take the smaller between the current score and the score passed back by a call to maximize function with the new board
+
+Smart Player chooseMove function
+Check to make sure the board passed in is valid
+iterate through the possible moves/holes
+	make the move and check for capture
+	the score of the move is a call to the maximize
+	compare the score to the current highest score
+return the hole that corresponds with the highest score
+
+GAME CLASS
+
+Status function
+Sum up the beans in play for both sides
+if one side equals zero
+	the game is over
+	add up the beans in play and in the pot on both sides
+	compare these totals and whichever is higher is the winner
+else
+	the game is not over
+
+Move function
+check status of game
+if its over move holes in play to pots and exit function
+For whoever's turn it is
+	Keep iterating until turn is over
+	choose the player's move
+	check to make sure its valid
+	make the player's move
+	check if it ends up in pot
+		if it is then change flag to iterate again for another turn
+	check if the move results in capture
+		if it does then execute the capture
+switch to the other person's turn
+
+Play function
+Check if there are beans in play on south side
+Keep iterating until the game is over
+	display board
+	make a move
+	check the status of the game
+if we have a winner
+	output statement for whoever won
+
+
+
+Bugs and Inefficiences:
+In smart player's choose move function, the function labels/the order in which they are called could be swapped. The smart player ends up choosing the correct move but the order in which I call the functions may not make the most sense. Smart player' choose move could also be better optimized in order to speed up its runtime in order to maximize the depth that we can go to to choose the best move possible for each turn. Besides smart player's inefficiencies, there were no other notable problems with my program that I could find.
+	
+
+Test Cases:
+
+BOARD CASES
+Board b1(6, 4)	// construct valid board
+Board b2(6, -1)	// construct board with valid holes but invalid init beans
+Board b3(0, 4)	// construct board with invalid holes but valid init beans
+Board b4(0, -1)	// construct board with invalid holes and init beans
+assert(b1.holes() == 6)	// check that valid board has right holes
+assert(b2.holes() == 6)	// check that board 2 has right holes
+assert(b3.holes() == 1)	// check that invalid holes were set to 1
+assert(b4.holes() == 1)	// check that invalid holes were set to 1
+assert(b1.beans(N, 1) == 4)	// check that beans were right
+assert(b2.beans(N, 1) == 0)	// check that invalid beans were set to 0
+assert(b3.beans(N, 1) == 4)	// check that beans were right
+assert(b4.beans(N, 1) == 0)	// check that invalid beans were set to 0
+Board b5(b3) // use copy constructor for board
+assert(b5.holes == 1)	// check holes of copy constructor
+assert(b5.beans(1) == 4) // check beans for copy constructor
+assert(b1.beans(N, 0) == 0) // check beans for pot
+assert(b1.beans(N, -1 == -1) // check invalid hole for beans
+assert(b1.beansInPlay(N) == 24) // check beans in play
+assert(b1.totalBeans() == 48) // check total beans
+assert(b1.sow(S, 1, endSide, endHole) == true) // check valid sow
+assert(endSide == S) // check endside of sow
+assert(endHole == 5) // check endhole of sow
+assert(b1.beans(S,1) == 0) // check that sow moved beans correctly
+assert(b1.beans(S,2) == 5) // check that sow moved beans correctly
+assert(b1.sow(S, -1, endSide, endHole) == false) // check sow for invalid hole
+assert(b1.moveToPot(S, 2, S) == true) // check move to pot
+assert(b1.beans(S,0) == 5) // check that move to pot worked
+assert(b1.setBeans(S,1,10) == true) // check set beans
+assert(b1.beans(S,1) == 10) // check that set beans worked
+
+PLAYER CASES
+Board b1(6,4)
+Board b2(1, 1)
+b2.setBeans(S,1,0)
+HumanPlayer human("jake")	// construct a human player
+assert(human.isInteractive == true)	// check isInteractive for human
+assert(human.name == "jake")	// check name for human
+n = human.chooseMove(b1, S)	// choose 1 as your move	// check chooseMove for human
+assert(n == 1)
+assert(human.chooseMove(b2, S) == -1)	// check chooseMove with invalid board for human
+BadPlayer baddie("badboy")	// construct a bad player
+assert(baddie.isInteractive == false)	// check isInteractive for bad player
+assert(baddie.name == "badboy")	// check name for bad player
+assert(baddie.chooseMove(b1, S) == 1)	// check choose move for bad player
+assert(baddie.chooseMove(b2, S) == -1)	// check choose move for invalid board for bad player
+SmartPlayer smartie("smarty")	// construct a smart player
+assert(smartie.isInteractive == false)	// check isInteractive for smart player
+assert(smartie.name == "smarty")	// check name for smart player
+assert(smartie.chooseMove(b2, S) == -1)	// check choose move for smart player for an invalid board
+
+GAME CASES
+Board b1(1,1)
+b1.setBeans(N,2)
+SmartPlayer smartie("smartie")
+HumanPlayer human("human")
+SmartPlayer* smarty = &smartie
+HumanPlayer* humann = &human
+Game g(b, smarty, humann)	// construct a game with a board and two players
+g.status(over, hasWinner, winner) // call status function
+assert(over == false) // check that game is not over
+g.play() // call play function
+assert(over == true) // check that game is over
+assert(hasWinner == true) // check that game has a winner
+assert(winner == NORTH) // check that North won the game
+
+
+
+
